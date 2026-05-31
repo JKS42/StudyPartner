@@ -35,6 +35,10 @@ async function readFilePayload(
   return { data: base64ToArrayBuffer(base64), sizeBytes };
 }
 
+export async function readFileBuffer(uri: string): Promise<{ data: ArrayBuffer; sizeBytes: number }> {
+  return readFilePayload(uri);
+}
+
 function mimeToSourceType(mime: string): SourceType {
   if (mime === 'application/pdf') return 'pdf';
   if (mime.startsWith('image/')) return 'image';

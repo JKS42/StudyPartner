@@ -45,13 +45,15 @@ In **Authentication → URL configuration**, add:
 - `studypartner://auth/callback`
 - `exp://127.0.0.1:8081` (for Expo Go during development)
 
-## 5. Edge Functions (AI)
+## 5. Edge Functions (notifications)
 
 ```bash
 supabase link --project-ref YOUR_PROJECT_REF
-supabase functions deploy generate-summary generate-quiz generate-flashcards
-supabase secrets set OPENAI_API_KEY=sk-...
+supabase functions deploy send-push send-study-reminders
+supabase secrets set CRON_SECRET=your-random-secret
 ```
+
+Summaries, quizzes, and flashcards are generated **on the device** — no AI Edge Functions required.
 
 ## Optional: Agent Skills
 

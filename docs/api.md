@@ -2,33 +2,9 @@
 
 ## Edge Functions
 
-All functions require `Authorization: Bearer <supabase_jwt>`.
-
-### POST `/functions/v1/generate-summary`
-
-```json
-{ "noteId": "uuid", "regenerate": false }
-```
-
-**Response:** `{ "summary": { "id", "note_id", "content_json", ... } }`
-
-### POST `/functions/v1/generate-quiz`
-
-```json
-{ "noteId": "uuid", "questionCount": 8 }
-```
-
-**Response:** `{ "quiz": { "id", "questions_json", ... } }`
-
-### POST `/functions/v1/generate-flashcards`
-
-```json
-{ "noteId": "uuid", "cardCount": 12 }
-```
-
-**Response:** `{ "deck": { "id", ... }, "cardCount": 12 }`
-
 ### POST `/functions/v1/send-push`
+
+Requires `Authorization: Bearer <supabase_jwt>`.
 
 Send a push notification to the authenticated user's registered devices.
 
@@ -43,15 +19,16 @@ Requires header: `Authorization: Bearer <CRON_SECRET>` (set in Supabase secrets)
 
 Schedule via Supabase Dashboard → Integrations → Cron, or pg_cron daily at 18:00.
 
+## Mobile study generation
 
-| Type | Limit |
-|------|-------|
-| Summaries | 20 |
-| Quizzes | 15 |
-| Flashcards | 15 |
+Summaries, quizzes, and flashcards are **not** Edge Functions. They are created in the app:
 
-Returns `429` when exceeded.
+| Feature | Module | Storage |
+|---------|--------|---------|
+| Summary | `src/lib/summaries.ts` | `summaries.content_json` |
+| Quiz | `src/lib/studyTools.ts` | `quizzes.questions_json` |
+| Flashcards | `src/lib/studyTools.ts` | `flashcard_decks` + `flashcards` |
 
 ## Database tables
 
-See `supabase/migrations/20260531120000_initial_schema.sql` for full schema: `profiles`, `folders`, `notes`, `files`, `summaries`, `quizzes`, `quiz_attempts`, `flashcard_decks`, `flashcards`, `study_sessions`, `progress_events`, `ai_usage`.
+See `supabase/migrations/` for full schema: `profiles`, `folders`, `notes`, `files`, `summaries`, `quizzes`, `quiz_attempts`, `flashcard_decks`, `flashcards`, `study_sessions`, `progress_events`, `push_tokens`.

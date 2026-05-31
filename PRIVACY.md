@@ -4,19 +4,20 @@
 
 ## Data we collect
 
-- **Account:** Email address and profile information you provide (name, school, subjects).
-- **Study materials:** Notes, PDFs, and images you upload.
+- **Account:** Email address and profile information you provide (name, username, school, subjects).
+- **Study materials:** Notes, PDFs, Word documents, and images you upload.
 - **Usage:** Study sessions, quiz scores, and progress events to power analytics.
 
 ## How we use data
 
-- Provide AI summaries, quizzes, and flashcards from your uploaded content.
+- Generate summaries, quizzes, and flashcards from your note text on your device.
 - Track study streaks and progress.
 - Authenticate your account and secure your data.
+- Send optional push or local study reminders if you enable them.
 
-## AI processing
+## Processing
 
-Note content is sent to our server-side AI provider (OpenAI or Google Gemini) only when you request generation. API keys are never stored on your device.
+Study content is processed on your device to build summaries and study tools. Uploaded files are stored in Supabase Storage. Optional push notifications use Expo's push service.
 
 ## Data storage
 

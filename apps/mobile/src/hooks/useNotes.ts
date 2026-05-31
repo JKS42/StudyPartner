@@ -5,19 +5,23 @@ import type { Note } from '../types/database';
 
 const NOTES_KEY = ['notes'] as const;
 
-export function useNotes(search = '') {
+export function useNotes(search = '', folderId: string | null = null) {
   return useQuery({
-    queryKey: [...NOTES_KEY, search],
+    queryKey: [...NOTES_KEY, search, folderId],
     queryFn: async () => {
       let query = supabase
         .from('notes')
         .select('*')
         .is('deleted_at', null)
         .order('updated_at', { ascending: false })
-        .limit(20);
+        .limit(50);
 
       if (search.trim()) {
         query = query.ilike('title', `%${search.trim()}%`);
+      }
+
+      if (folderId) {
+        query = query.eq('folder_id', folderId);
       }
 
       const { data, error } = await query;
