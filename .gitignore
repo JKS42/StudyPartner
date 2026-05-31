@@ -13,3 +13,4 @@ web-build/
 apps/mobile/.env
 .DS_Store
 Thumbs.db
+supabase/.temp/
