@@ -27,7 +27,7 @@ StudyPartner is a monorepo with an Expo mobile client and Supabase backend. All 
 
 ## Backend (Supabase)
 
-- **Auth:** Email/password + Google OAuth
+- **Auth:** Email/password
 - **Database:** PostgreSQL with RLS on all tables
 - **Storage:** Private `user-uploads` bucket (`{user_id}/{note_id}/file`)
 - **Edge Functions:** `send-push`, `send-study-reminders` (notifications only)

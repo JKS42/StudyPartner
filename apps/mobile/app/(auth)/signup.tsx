@@ -5,8 +5,7 @@ import { BrandLogo } from '../../src/components/BrandLogo';
 import { Button } from '../../src/components/Button';
 import { GeometricPattern } from '../../src/components/GeometricPattern';
 import { Input } from '../../src/components/Input';
-import { signInWithGoogle, signUpWithEmail } from '../../src/hooks/useAuth';
-import { isSupabaseConfigured } from '../../src/lib/supabase';
+import { signUpWithEmail } from '../../src/hooks/useAuth';
 import { palette, spacing } from '../../src/theme/colors';
 import { typography } from '../../src/theme/typography';
 
@@ -14,18 +13,6 @@ export default function SignupScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-
-  const handleGoogle = async () => {
-    setLoading(true);
-    try {
-      await signInWithGoogle();
-      router.replace('/(tabs)');
-    } catch (e) {
-      Alert.alert('Google sign-in failed', e instanceof Error ? e.message : 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSignup = async () => {
     if (password.length < 6) {
@@ -57,7 +44,6 @@ export default function SignupScreen() {
         <Input label="Password" secureTextEntry value={password} onChangeText={setPassword} />
 
         <Button title="Sign up" onPress={handleSignup} loading={loading} />
-        <Button title="Sign up with Google" variant="secondary" onPress={handleGoogle} loading={loading} />
 
         <Link href="/(auth)/login" style={styles.link}>
           <Text style={styles.linkMuted}>

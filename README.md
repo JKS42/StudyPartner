@@ -16,7 +16,7 @@ StudyPartner is designed for students who want a single place to collect lecture
 
 | Category | Capabilities |
 |----------|--------------|
-| **Authentication** | Email/password and Google sign-in with secure session storage |
+| **Authentication** | Email/password sign-in with secure session storage |
 | **Materials** | Upload PDFs, Word documents (`.docx`), images, and plain text; organize with folders |
 | **Study tools** | On-device summaries, quizzes, and flashcards generated from your note content |
 | **Focus** | Pomodoro timer with session logging |
@@ -66,8 +66,7 @@ Edit `.env` with your Supabase project URL and publishable (anon) key.
 
 1. Create a new project in the Supabase dashboard.
 2. Apply migrations from `supabase/migrations/` via the SQL Editor or `supabase db push`.
-3. Under **Authentication → Providers**, enable **Google** (optional) and add the redirect URL:  
-   `studypartner://auth/callback`
+3. Under **Authentication → Providers**, enable **Email**.
 4. *(Optional)* Deploy notification Edge Functions:
 
    ```bash
@@ -75,7 +74,7 @@ Edit `.env` with your Supabase project URL and publishable (anon) key.
    supabase secrets set CRON_SECRET=<your-random-secret>
    ```
 
-See [docs/supabase-connect.md](docs/supabase-connect.md) for step-by-step connection details, including **Google sign-in** redirect URLs.
+See [docs/supabase-connect.md](docs/supabase-connect.md) for step-by-step connection details.
 
 ### Run the application
 

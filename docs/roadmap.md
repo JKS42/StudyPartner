@@ -5,7 +5,7 @@ This document mirrors the project plan for contributors. Phases map to git miles
 ## Phase 1 — Setup & auth ✅
 
 - Expo SDK 54 + Supabase init
-- Email / Google auth, profiles, navigation shell
+- Email auth, profiles, navigation shell
 - CI lint + typecheck
 
 ## Phase 2 — Upload & storage ✅

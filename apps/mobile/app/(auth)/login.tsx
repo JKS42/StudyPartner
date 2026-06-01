@@ -5,7 +5,7 @@ import { BrandLogo } from '../../src/components/BrandLogo';
 import { Button } from '../../src/components/Button';
 import { GeometricPattern } from '../../src/components/GeometricPattern';
 import { Input } from '../../src/components/Input';
-import { signInWithEmail, signInWithGoogle } from '../../src/hooks/useAuth';
+import { signInWithEmail } from '../../src/hooks/useAuth';
 import { isSupabaseConfigured } from '../../src/lib/supabase';
 import { palette, spacing } from '../../src/theme/colors';
 import { typography } from '../../src/theme/typography';
@@ -26,23 +26,6 @@ export default function LoginScreen() {
       router.replace('/(tabs)');
     } catch (e) {
       Alert.alert('Login failed', e instanceof Error ? e.message : 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogle = async () => {
-    if (!isSupabaseConfigured) {
-      Alert.alert('Setup required', 'Add Supabase keys to apps/mobile/.env');
-      return;
-    }
-    setLoading(true);
-    try {
-      await signInWithGoogle();
-      // AuthNavigationSync also navigates when session is set via deep link.
-      router.replace('/(tabs)');
-    } catch (e) {
-      Alert.alert('Google sign-in failed', e instanceof Error ? e.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -73,8 +56,6 @@ export default function LoginScreen() {
         />
 
         <Button title="Sign in" onPress={handleLogin} loading={loading} />
-        <View style={styles.gap} />
-        <Button title="Continue with Google" variant="secondary" onPress={handleGoogle} />
 
         <Link href="/(auth)/forgot-password" style={styles.link}>
           <Text style={styles.linkAccent}>Forgot password?</Text>
@@ -95,7 +76,6 @@ const styles = StyleSheet.create({
   form: { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: 40 },
   heading: { ...typography.h1, marginTop: spacing.lg, marginBottom: 6, color: palette.white },
   sub: { ...typography.body, color: 'rgba(255,255,255,0.75)', marginBottom: spacing.lg },
-  gap: { height: 12 },
   link: { marginTop: 20, alignSelf: 'center' },
   linkAccent: { color: palette.orangeLight, fontWeight: '600' },
   linkMuted: { color: 'rgba(255,255,255,0.75)' },

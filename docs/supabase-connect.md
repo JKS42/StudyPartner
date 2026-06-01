@@ -38,52 +38,12 @@ Restart Expo after editing: `npm start`.
 
 Run `supabase/migrations/20260531120000_initial_schema.sql` in the Supabase SQL editor (or `supabase db push`).
 
-## 4. Auth redirects (required for Google sign-in)
+## 4. Auth (email / password)
 
-In **Authentication → URL configuration → Redirect URLs**, add **every** URL your app may use:
+The app uses **email and password** only (no Google sign-in in the client).
 
-| Environment | Typical redirect URL |
-|-------------|----------------------|
-| Dev build / production | `studypartner://auth/callback` |
-| Expo Go (local) | `exp://127.0.0.1:8081/--/auth/callback` |
-| Expo Go (LAN) | `exp://YOUR_LAN_IP:8081/--/auth/callback` |
-
-To see the exact URL your device uses, temporarily log it from the app:
-
-```ts
-import { getAuthRedirectUri } from './src/lib/authRedirect';
-console.log(getAuthRedirectUri());
-```
-
-Mismatch between this URL and Supabase’s allow list is the most common cause of Google sign-in failing silently.
-
-### Fix: redirected to `http://localhost:3000` after Google
-
-That page is **not** your app. Supabase sends users there when the app’s `redirectTo` URL is **not** on the allow list, and it falls back to **Site URL** (default `http://localhost:3000`).
-
-1. In the Metro/Expo terminal, tap Google sign-in and note the log line:  
-   `[StudyPartner] Google OAuth redirectTo: …`
-2. Copy that **exact** URL into **Redirect URLs**.
-3. Under **Site URL**, replace `http://localhost:3000` with:
-   - `studypartner://auth/callback` for mobile-only testing, or
-   - `http://localhost:8081` if you use Expo web (`w` in the terminal).
-
-Optional override in `apps/mobile/.env`:
-
-```env
-# Only if auto-detect fails — use your real LAN IP, never YOUR_IP
-EXPO_PUBLIC_AUTH_REDIRECT_URI=exp://192.168.1.10:8081/--/auth/callback
-```
-
-**iOS + Expo Go:** Do not use `studypartner://` or `exp://YOUR_IP:...` — Safari will say the address is invalid. Leave `EXPO_PUBLIC_AUTH_REDIRECT_URI` unset and copy the URL from the Metro log after reload.
-
-### Google provider
-
-1. **Authentication → Providers → Google** — enable and add OAuth **Client ID** and **Client secret** from [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
-2. Create an OAuth client of type **Web application** (used by Supabase, not the mobile app directly).
-3. Under **Authorized redirect URIs** in Google Cloud, add your Supabase callback:  
-   `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`
-4. Copy the same client ID/secret into the Supabase Google provider settings.
+1. In **Authentication → Providers**, ensure **Email** is enabled.
+2. For password-reset emails, add `studypartner://` (or your Expo deep link) under **Redirect URLs** if you use magic links later.
 
 ## 5. Edge Functions (notifications)
 
