@@ -4,6 +4,7 @@ import * as Linking from 'expo-linking';
 import { Platform } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { getAuthRedirectUri } from '../lib/authRedirect';
+import { isValidAuthRedirectUri } from '../lib/authRedirectUri';
 import { completeOAuthFromUrl, syncSessionFromStorage } from '../lib/oauthSession';
 import { useAuthStore } from '../stores/authStore';
 
@@ -72,6 +73,12 @@ export async function signInWithGoogle() {
 
   if (__DEV__) {
     console.log('[StudyPartner] Google OAuth redirectTo:', redirectTo);
+  }
+
+  if (!isValidAuthRedirectUri(redirectTo)) {
+    throw new Error(
+      'Invalid OAuth redirect URL. In apps/mobile/.env remove EXPO_PUBLIC_AUTH_REDIRECT_URI or replace YOUR_IP with your computer\'s LAN IP (e.g. 192.168.1.5). Then add the logged redirectTo URL in Supabase → Auth → Redirect URLs.'
+    );
   }
 
   if (Platform.OS === 'web') {

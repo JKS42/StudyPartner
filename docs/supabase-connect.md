@@ -71,8 +71,11 @@ That page is **not** your app. Supabase sends users there when the app’s `redi
 Optional override in `apps/mobile/.env`:
 
 ```env
+# Only if auto-detect fails — use your real LAN IP, never YOUR_IP
 EXPO_PUBLIC_AUTH_REDIRECT_URI=exp://192.168.1.10:8081/--/auth/callback
 ```
+
+**iOS + Expo Go:** Do not use `studypartner://` or `exp://YOUR_IP:...` — Safari will say the address is invalid. Leave `EXPO_PUBLIC_AUTH_REDIRECT_URI` unset and copy the URL from the Metro log after reload.
 
 ### Google provider
 
