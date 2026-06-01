@@ -39,6 +39,7 @@ export default function LoginScreen() {
     setLoading(true);
     try {
       await signInWithGoogle();
+      // AuthNavigationSync also navigates when session is set via deep link.
       router.replace('/(tabs)');
     } catch (e) {
       Alert.alert('Google sign-in failed', e instanceof Error ? e.message : 'Unknown error');
