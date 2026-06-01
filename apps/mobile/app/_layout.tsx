@@ -14,6 +14,7 @@ export default function RootLayout() {
         <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="index" />
           <Stack.Screen name="(auth)" />
+          <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="upload" options={{ presentation: 'modal' }} />
           <Stack.Screen name="note/[id]" />

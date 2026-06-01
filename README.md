@@ -75,7 +75,7 @@ Edit `.env` with your Supabase project URL and publishable (anon) key.
    supabase secrets set CRON_SECRET=<your-random-secret>
    ```
 
-See [docs/supabase-connect.md](docs/supabase-connect.md) for step-by-step connection details.
+See [docs/supabase-connect.md](docs/supabase-connect.md) for step-by-step connection details, including **Google sign-in** redirect URLs.
 
 ### Run the application
 

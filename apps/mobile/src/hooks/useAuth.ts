@@ -1,12 +1,15 @@
 import { useEffect } from 'react';
 import * as WebBrowser from 'expo-web-browser';
-import { makeRedirectUri } from 'expo-auth-session';
+import * as Linking from 'expo-linking';
 import { supabase } from '../lib/supabase';
+import { createSessionFromAuthUrl, getAuthRedirectUri } from '../lib/authRedirect';
 import { useAuthStore } from '../stores/authStore';
 
 WebBrowser.maybeCompleteAuthSession();
 
-const redirectTo = makeRedirectUri({ scheme: 'studypartner', path: 'auth/callback' });
+function isAuthCallbackUrl(url: string): boolean {
+  return url.includes('auth/callback');
+}
 
 export function useAuthListener() {
   const setSession = useAuthStore((s) => s.setSession);
@@ -23,7 +26,28 @@ export function useAuthListener() {
       setInitialized(true);
     });
 
-    return () => sub.subscription.unsubscribe();
+    const handleDeepLink = async (url: string) => {
+      if (!isAuthCallbackUrl(url)) return;
+      try {
+        const session = await createSessionFromAuthUrl(url);
+        if (session) setSession(session);
+      } catch {
+        // User can retry sign-in from the login screen
+      }
+    };
+
+    Linking.getInitialURL().then((url) => {
+      if (url) void handleDeepLink(url);
+    });
+
+    const linkSub = Linking.addEventListener('url', ({ url }) => {
+      void handleDeepLink(url);
+    });
+
+    return () => {
+      sub.subscription.unsubscribe();
+      linkSub.remove();
+    };
   }, [setSession, setInitialized]);
 }
 
@@ -38,26 +62,43 @@ export async function signUpWithEmail(email: string, password: string) {
 }
 
 export async function signInWithGoogle() {
+  const redirectTo = getAuthRedirectUri();
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo, skipBrowserRedirect: false },
+    options: {
+      redirectTo,
+      skipBrowserRedirect: true,
+    },
   });
   if (error) throw error;
-  if (data.url) {
-    const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
-    if (result.type === 'success' && result.url) {
-      const url = new URL(result.url);
-      const params = new URLSearchParams(url.hash.replace('#', '?'));
-      const access_token = params.get('access_token');
-      const refresh_token = params.get('refresh_token');
-      if (access_token && refresh_token) {
-        await supabase.auth.setSession({ access_token, refresh_token });
-      }
-    }
+  if (!data.url) {
+    throw new Error(
+      'Google sign-in URL was not returned. Enable Google under Supabase → Authentication → Providers.'
+    );
+  }
+
+  const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo, {
+    showInRecents: true,
+  });
+
+  if (result.type === 'cancel' || result.type === 'dismiss') {
+    throw new Error('Google sign-in was cancelled');
+  }
+  if (result.type !== 'success' || !result.url) {
+    throw new Error('Google sign-in did not complete');
+  }
+
+  const session = await createSessionFromAuthUrl(result.url);
+  if (!session) {
+    throw new Error(
+      `Sign-in callback had no session. In Supabase → Authentication → URL configuration, add this redirect URL:\n${redirectTo}`
+    );
   }
 }
 
 export async function resetPassword(email: string) {
+  const redirectTo = getAuthRedirectUri();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo,
   });

@@ -32,6 +32,10 @@ export default function LoginScreen() {
   };
 
   const handleGoogle = async () => {
+    if (!isSupabaseConfigured) {
+      Alert.alert('Setup required', 'Add Supabase keys to apps/mobile/.env');
+      return;
+    }
     setLoading(true);
     try {
       await signInWithGoogle();

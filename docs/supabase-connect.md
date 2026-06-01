@@ -38,12 +38,32 @@ Restart Expo after editing: `npm start`.
 
 Run `supabase/migrations/20260531120000_initial_schema.sql` in the Supabase SQL editor (or `supabase db push`).
 
-## 4. Auth redirects
+## 4. Auth redirects (required for Google sign-in)
 
-In **Authentication → URL configuration**, add:
+In **Authentication → URL configuration → Redirect URLs**, add **every** URL your app may use:
 
-- `studypartner://auth/callback`
-- `exp://127.0.0.1:8081` (for Expo Go during development)
+| Environment | Typical redirect URL |
+|-------------|----------------------|
+| Dev build / production | `studypartner://auth/callback` |
+| Expo Go (local) | `exp://127.0.0.1:8081/--/auth/callback` |
+| Expo Go (LAN) | `exp://YOUR_LAN_IP:8081/--/auth/callback` |
+
+To see the exact URL your device uses, temporarily log it from the app:
+
+```ts
+import { getAuthRedirectUri } from './src/lib/authRedirect';
+console.log(getAuthRedirectUri());
+```
+
+Mismatch between this URL and Supabase’s allow list is the most common cause of Google sign-in failing silently.
+
+### Google provider
+
+1. **Authentication → Providers → Google** — enable and add OAuth **Client ID** and **Client secret** from [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
+2. Create an OAuth client of type **Web application** (used by Supabase, not the mobile app directly).
+3. Under **Authorized redirect URIs** in Google Cloud, add your Supabase callback:  
+   `https://YOUR_PROJECT_REF.supabase.co/auth/v1/callback`
+4. Copy the same client ID/secret into the Supabase Google provider settings.
 
 ## 5. Edge Functions (notifications)
 
