@@ -57,6 +57,23 @@ console.log(getAuthRedirectUri());
 
 Mismatch between this URL and Supabase’s allow list is the most common cause of Google sign-in failing silently.
 
+### Fix: redirected to `http://localhost:3000` after Google
+
+That page is **not** your app. Supabase sends users there when the app’s `redirectTo` URL is **not** on the allow list, and it falls back to **Site URL** (default `http://localhost:3000`).
+
+1. In the Metro/Expo terminal, tap Google sign-in and note the log line:  
+   `[StudyPartner] Google OAuth redirectTo: …`
+2. Copy that **exact** URL into **Redirect URLs**.
+3. Under **Site URL**, replace `http://localhost:3000` with:
+   - `studypartner://auth/callback` for mobile-only testing, or
+   - `http://localhost:8081` if you use Expo web (`w` in the terminal).
+
+Optional override in `apps/mobile/.env`:
+
+```env
+EXPO_PUBLIC_AUTH_REDIRECT_URI=exp://192.168.1.10:8081/--/auth/callback
+```
+
 ### Google provider
 
 1. **Authentication → Providers → Google** — enable and add OAuth **Client ID** and **Client secret** from [Google Cloud Console](https://console.cloud.google.com/apis/credentials).

@@ -1,15 +1,22 @@
 import { router } from 'expo-router';
 import { useEffect } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Platform, StyleSheet, View } from 'react-native';
 import * as Linking from 'expo-linking';
 import { createSessionFromAuthUrl } from '../../src/lib/authRedirect';
 import { palette } from '../../src/theme/colors';
 
-/** Handles cold-start deep links after Google OAuth (Expo Go / standalone). */
+function getCallbackUrl(): string | null {
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    return window.location.href;
+  }
+  return null;
+}
+
+/** Completes Google OAuth after redirect (Expo Go, dev build, or web). */
 export default function AuthCallbackScreen() {
   useEffect(() => {
     const finish = async () => {
-      const url = await Linking.getInitialURL();
+      const url = getCallbackUrl() ?? (await Linking.getInitialURL());
       if (!url) {
         router.replace('/(auth)/login');
         return;

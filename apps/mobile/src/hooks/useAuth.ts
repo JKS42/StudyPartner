@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
+import { Platform } from 'react-native';
 import { supabase } from '../lib/supabase';
 import { createSessionFromAuthUrl, getAuthRedirectUri } from '../lib/authRedirect';
 import { useAuthStore } from '../stores/authStore';
@@ -61,8 +62,26 @@ export async function signUpWithEmail(email: string, password: string) {
   if (error) throw error;
 }
 
+const redirectMismatchHint = (redirectTo: string) =>
+  `Add this exact URL under Supabase → Authentication → URL configuration → Redirect URLs:\n${redirectTo}\n\n` +
+  `Also change Site URL away from http://localhost:3000 (that URL is only a fallback when the redirect above is missing).`;
+
 export async function signInWithGoogle() {
   const redirectTo = getAuthRedirectUri();
+
+  if (__DEV__) {
+    console.log('[StudyPartner] Google OAuth redirectTo:', redirectTo);
+  }
+
+  // Web: full-page redirect back to /auth/callback on the same origin (e.g. :8081, not :3000).
+  if (Platform.OS === 'web') {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo, skipBrowserRedirect: false },
+    });
+    if (error) throw error;
+    return;
+  }
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
@@ -89,11 +108,15 @@ export async function signInWithGoogle() {
     throw new Error('Google sign-in did not complete');
   }
 
+  if (result.url.includes('localhost:3000')) {
+    throw new Error(
+      `Supabase redirected to localhost:3000 instead of the app.\n\n${redirectMismatchHint(redirectTo)}`
+    );
+  }
+
   const session = await createSessionFromAuthUrl(result.url);
   if (!session) {
-    throw new Error(
-      `Sign-in callback had no session. In Supabase → Authentication → URL configuration, add this redirect URL:\n${redirectTo}`
-    );
+    throw new Error(`Sign-in callback had no session.\n\n${redirectMismatchHint(redirectTo)}`);
   }
 }
 
